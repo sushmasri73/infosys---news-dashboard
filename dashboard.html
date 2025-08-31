@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Dashboard</title>
+    <!-- Use the Inter font from Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap">
+    <!-- Load Tailwind CSS from a CDN for easy styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .container {
+            max-width: 1600px;
+            margin: auto;
+        }
+        .article-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            background-color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+        }
+        .article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .article-card img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+        .article-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .article-title {
+            font-size: 1.125rem;
+            line-height: 1.5;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .article-meta {
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+        .article-description {
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #6b7280;
+            margin-top: 0.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex">
+    <!-- Sidebar -->
+    <nav class="bg-gray-800 text-white w-64 p-4 flex flex-col items-center shadow-lg">
+        <h1 class="text-3xl font-bold mb-8 mt-4 text-center">News Dashboard</h1>
+        <ul class="w-full space-y-2">
+            <li>
+                <button id="news-feed-link" class="w-full flex items-center p-3 rounded-lg text-left transition-colors duration-200 hover:bg-gray-700 active-link bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 14H9m6 0a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    News Feed
+                </button>
+            </li>
+            <li>
+                <button id="analysis-link" class="w-full flex items-center p-3 rounded-lg text-left transition-colors duration-200 hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m0 0a8 8 0 100-16 8 8 0 000 16z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12H8" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Analysis
+                </button>
+            </li>
+            <li>
+                <button id="profile-link" class="w-full flex items-center p-3 rounded-lg text-left transition-colors duration-200 hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A12 12 0 0012 21a12 12 0 006.879-3.196M16 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2a4 4 0 004 4h4a4 4 0 004-4zM12 11a4 4 0 100-8 4 4 0 000 8z" />
+                    </svg>
+                    Profile
+                </button>
+            </li>
+            <li>
+                <button id="logout-link" class="w-full flex items-center p-3 rounded-lg text-left transition-colors duration-200 hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Logout
+                </button>
+            </li>
+        </ul>
+    </nav>
+    
+    <!-- Main Content Area -->
+    <main class="flex-1 p-4 sm:p-8 overflow-y-auto">
+        
+        <!-- News Feed Section -->
+        <section id="news-section" class="active-section">
+            <!-- Header -->
+            <header class="mb-8 flex justify-between items-center">
+                <h1 id="feed-title" class="text-3xl font-bold text-gray-800">Top Headlines</h1>
+                
+                <!-- Search Bar -->
+                <div class="flex items-center space-x-2">
+                    <form id="search-form" class="flex">
+                        <input type="text" id="search-input" placeholder="Search for news..." class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-64">
+                        <button type="submit" class="ml-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </header>
+
+            <!-- Category Tabs -->
+            <div id="category-tabs" class="mb-8 flex flex-wrap gap-2 sm:gap-4 border-b border-gray-300">
+                <button class="tab-button px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 border-blue-600 text-blue-600 focus:outline-none" data-category="general">General</button>
+                <button class="tab-button px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 border-transparent text-gray-700 hover:text-blue-600 hover:border-blue-600 focus:outline-none" data-category="business">Business</button>
+                <button class="tab-button px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 border-transparent text-gray-700 hover:text-blue-600 hover:border-blue-600 focus:outline-none" data-category="entertainment">Entertainment</button>
+                <button class="tab-button px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 border-transparent text-gray-700 hover:text-blue-600 hover:border-blue-600 focus:outline-none" data-category="health">Health</button>
+                <button class="tab-button px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 border-transparent text-gray-700 hover:text-blue-600 hover:border-blue-600 focus:outline-none" data-category="science">Science</button>
+                <button class="tab-button px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 border-transparent text-gray-700 hover:text-blue-600 hover:border-blue-600 focus:outline-none" data-category="sports">Sports</button>
+                <button class="tab-button px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 border-transparent text-gray-700 hover:text-blue-600 hover:border-blue-600 focus:outline-none" data-category="technology">Technology</button>
+                <button class="tab-button px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 border-transparent text-gray-700 hover:text-blue-600 hover:border-blue-600 focus:outline-none" data-category="politics">Politics</button>
+            </div>
+
+            <!-- News articles section -->
+            <div id="news-list" class="flex flex-col gap-6">
+                <!-- News articles will be injected here by JavaScript -->
+                <p class="text-center text-gray-500">Loading headlines...</p>
+            </div>
+        </section>
+
+        <!-- Analysis Section -->
+        <section id="analysis-section" class="hidden">
+            <header class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-800">Analysis</h1>
+            </header>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Sentiment Analysis Chart -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Sentiment Analysis</h2>
+                    <div class="relative h-64">
+                        <canvas id="sentimentChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- New: Sentiment Analysis Over Time Chart -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Sentiment Over Time</h2>
+                    <div class="relative h-64">
+                        <canvas id="sentimentOverTimeChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Source Distribution Chart -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">News Source Distribution</h2>
+                    <div class="relative h-64">
+                        <canvas id="sourceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profile-section" class="hidden">
+            <header class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-800">User Profile</h1>
+            </header>
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Profile details - Left side -->
+                <div class="bg-white p-6 rounded-lg shadow-lg flex-1">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Profile Settings</h2>
+                    <div class="space-y-6">
+                        <!-- Profile Image Section -->
+                        <div class="flex flex-col items-center">
+                            <div class="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-300">
+                                <img id="profile-image" src="https://placehold.co/128x128/e2e8f0/64748b?text=Profile" alt="Profile Image" class="w-full h-full object-cover">
+                                <label for="image-upload" class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white cursor-pointer opacity-0 hover:opacity-100 transition-opacity duration-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </label>
+                            </div>
+                            <input type="file" id="image-upload" class="hidden" accept="image/*">
+                        </div>
+                        
+                        <!-- User Information Section -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">User Information</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                                    <input type="text" id="username" name="username" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Your Username">
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                                    <input type="email" id="email" name="email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="your.email@example.com">
+                                </div>
+                                <div>
+                                    <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                                    <input type="tel" id="phone" name="phone" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="e.g., +1234567890">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Button -->
+                        <div class="flex justify-end">
+                            <button id="save-profile-btn" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usage Chart - Right side -->
+                <div class="bg-white p-6 rounded-lg shadow-lg flex-1">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Last 7 Days Usage</h2>
+                    <div class="relative h-64">
+                        <canvas id="usageChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // --- DOM Elements and State ---
+        const newsSection = document.getElementById('news-section');
+        const analysisSection = document.getElementById('analysis-section');
+        const profileSection = document.getElementById('profile-section');
+        const newsFeedLink = document.getElementById('news-feed-link');
+        const analysisLink = document.getElementById('analysis-link');
+        const profileLink = document.getElementById('profile-link');
+        const newsList = document.getElementById('news-list');
+        const feedTitle = document.getElementById('feed-title');
+        const categoryTabs = document.getElementById('category-tabs');
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const searchForm = document.getElementById('search-form');
+        const searchInput = document.getElementById('search-input');
+        let currentCategory = 'general';
+
+        // --- Chart Contexts ---
+        const sentimentCtx = document.getElementById('sentimentChart').getContext('2d');
+        const sourceCtx = document.getElementById('sourceChart').getContext('2d');
+        const sentimentOverTimeCtx = document.getElementById('sentimentOverTimeChart').getContext('2d');
+        const usageCtx = document.getElementById('usageChart').getContext('2d');
+
+        // Chart instances
+        let sentimentChart, sourceChart, sentimentOverTimeChart, usageChart;
+        
+        // --- Helper Functions ---
+
+        /**
+         * Hides all sections and shows the specified one, updating navigation links.
+         * @param {string} sectionId The ID of the section to show.
+         */
+        function showSection(sectionId) {
+            newsSection.classList.add('hidden');
+            analysisSection.classList.add('hidden');
+            profileSection.classList.add('hidden');
+            document.getElementById(sectionId).classList.remove('hidden');
+
+            // Update navigation links to show active state
+            newsFeedLink.classList.remove('bg-gray-700');
+            analysisLink.classList.remove('bg-gray-700');
+            profileLink.classList.remove('bg-gray-700');
+            
+            if (sectionId === 'news-section') {
+                newsFeedLink.classList.add('bg-gray-700');
+            } else if (sectionId === 'analysis-section') {
+                analysisLink.classList.add('bg-gray-700');
+                updateAllCharts(currentCategory);
+            } else if (sectionId === 'profile-section') {
+                profileLink.classList.add('bg-gray-700');
+                updateUsageChart();
+            }
+        }
+
+        /**
+         * Generates mock data for the charts based on the selected category.
+         * @param {string} category The news category.
+         * @returns {object} An object containing sentiment, sentiment over time, and source data.
+         */
+        function generateMockChartData(category) {
+            let sentimentData, sentimentOverTimeData, sourceData;
+
+            switch (category) {
+                case 'business':
+                    sentimentData = { positive: 65, negative: 20, neutral: 15 };
+                    sentimentOverTimeData = generateTimeSeriesData(70, 15, 15);
+                    sourceData = { labels: ['Wall Street Journal', 'Bloomberg', 'Reuters', 'Forbes'], data: [25, 20, 18, 12] };
+                    break;
+                case 'technology':
+                    sentimentData = { positive: 80, negative: 5, neutral: 15 };
+                    sentimentOverTimeData = generateTimeSeriesData(85, 5, 10);
+                    sourceData = { labels: ['TechCrunch', 'The Verge', 'WIRED', 'Ars Technica'], data: [30, 22, 15, 10] };
+                    break;
+                case 'sports':
+                    sentimentData = { positive: 75, negative: 10, neutral: 15 };
+                    sentimentOverTimeData = generateTimeSeriesData(80, 10, 10);
+                    sourceData = { labels: ['ESPN', 'Bleacher Report', 'CBS Sports', 'BBC Sport'], data: [40, 25, 15, 10] };
+                    break;
+                case 'entertainment':
+                    sentimentData = { positive: 60, negative: 25, neutral: 15 };
+                    sentimentOverTimeData = generateTimeSeriesData(65, 25, 10);
+                    sourceData = { labels: ['Variety', 'The Hollywood Reporter', 'Rolling Stone'], data: [20, 18, 15] };
+                    break;
+                case 'science':
+                    sentimentData = { positive: 85, negative: 5, neutral: 10 };
+                    sentimentOverTimeData = generateTimeSeriesData(90, 5, 5);
+                    sourceData = { labels: ['Nature', 'Science', 'Scientific American', 'NASA'], data: [15, 12, 10, 8] };
+                    break;
+                case 'health':
+                    sentimentData = { positive: 70, negative: 10, neutral: 20 };
+                    sentimentOverTimeData = generateTimeSeriesData(75, 10, 15);
+                    sourceData = { labels: ['WebMD', 'Mayo Clinic', 'Healthline', 'The Lancet'], data: [20, 15, 12, 10] };
+                    break;
+                case 'general':
+                default:
+                    sentimentData = { positive: 55, negative: 15, neutral: 30 };
+                    sentimentOverTimeData = generateTimeSeriesData(50, 20, 30);
+                    sourceData = { labels: ['BBC News', 'CNN', 'Reuters', 'The New York Times', 'Al Jazeera English'], data: [15, 12, 10, 8, 6] };
+                    break;
+            }
+
+            return {
+                sentiment: sentimentData,
+                sentimentOverTime: sentimentOverTimeData,
+                source: sourceData
+            };
+        }
+
+        /**
+         * Helper function to generate time-series data based on a base distribution.
+         * @param {number} pos Base positive percentage.
+         * @param {number} neg Base negative percentage.
+         * @param {number} neu Base neutral percentage.
+         * @returns {object} The time-series data.
+         */
+        function generateTimeSeriesData(pos, neg, neu) {
+            const today = new Date();
+            const dates = [];
+            const positiveData = [];
+            const negativeData = [];
+            const neutralData = [];
+
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(today.getDate() - i);
+                dates.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                
+                positiveData.push(pos + 5 * (Math.random() - 0.5));
+                negativeData.push(neg + 5 * (Math.random() - 0.5));
+                neutralData.push(neu + 5 * (Math.random() - 0.5));
+            }
+            return { dates, positive: positiveData, negative: negativeData, neutral: neutralData };
+        }
+        
+        /**
+         * Creates or updates the sentiment chart.
+         * @param {object} data The sentiment data.
+         */
+        function updateSentimentChart(data) {
+            const chartData = {
+                labels: ['Positive', 'Negative', 'Neutral'],
+                datasets: [{
+                    data: [data.positive, data.negative, data.neutral],
+                    backgroundColor: ['#4ade80', '#ef4444', '#94a3b8'],
+                    hoverBackgroundColor: ['#22c55e', '#dc2626', '#64748b']
+                }]
+            };
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: (tooltipItem) => `${tooltipItem.label}: ${tooltipItem.raw.toFixed(2)}%`
+                        }
+                    }
+                }
+            };
+            if (sentimentChart) {
+                sentimentChart.data = chartData;
+                sentimentChart.update();
+            } else {
+                sentimentChart = new Chart(sentimentCtx, { type: 'doughnut', data: chartData, options: chartOptions });
+            }
+        }
+
+        /**
+         * Creates or updates the source distribution chart.
+         * @param {object} data The source data.
+         */
+        function updateSourceChart(data) {
+            const chartData = {
+                labels: data.labels,
+                datasets: [{
+                    data: data.data,
+                    backgroundColor: data.labels.map(() => getRandomColor()),
+                    hoverOffset: 4
+                }]
+            };
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' } }
+            };
+            if (sourceChart) {
+                sourceChart.data = chartData;
+                sourceChart.update();
+            } else {
+                sourceChart = new Chart(sourceCtx, { type: 'bar', data: chartData, options: chartOptions });
+            }
+        }
+        
+        /**
+         * Creates or updates the sentiment over time chart.
+         * @param {object} data The time-series sentiment data.
+         */
+        function updateSentimentOverTimeChart(data) {
+            const chartData = {
+                labels: data.dates,
+                datasets: [
+                    { label: 'Positive', data: data.positive, borderColor: '#4ade80', fill: false },
+                    { label: 'Negative', data: data.negative, borderColor: '#ef4444', fill: false },
+                    { label: 'Neutral', data: data.neutral, borderColor: '#94a3b8', fill: false }
+                ]
+            };
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    x: { title: { display: true, text: 'Date' } },
+                    y: { beginAtZero: true, title: { display: true, text: 'Sentiment Score' } }
+                }
+            };
+            if (sentimentOverTimeChart) {
+                sentimentOverTimeChart.data = chartData;
+                sentimentOverTimeChart.update();
+            } else {
+                sentimentOverTimeChart = new Chart(sentimentOverTimeCtx, { type: 'line', data: chartData, options: chartOptions });
+            }
+        }
+        
+        /**
+         * Main function to update all charts with data for a given category.
+         * @param {string} category The news category.
+         */
+        function updateAllCharts(category) {
+            const data = generateMockChartData(category);
+            updateSentimentChart(data.sentiment);
+            updateSentimentOverTimeChart(data.sentimentOverTime);
+            updateSourceChart(data.source);
+        }
+
+        /**
+         * Generates and updates the app usage chart.
+         */
+        function updateUsageChart() {
+            const dates = [];
+            const usageData = [];
+            const today = new Date();
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(today.getDate() - i);
+                dates.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                usageData.push(Math.floor(Math.random() * 60) + 15); // Mock usage between 15 and 75 minutes
+            }
+            
+            const chartData = {
+                labels: dates,
+                datasets: [{
+                    label: 'Minutes Used',
+                    data: usageData,
+                    backgroundColor: '#4c51bf',
+                    borderColor: '#4c51bf',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                }]
+            };
+
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { title: { display: true, text: 'Date' } },
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Minutes' }
+                    }
+                }
+            };
+
+            if (usageChart) {
+                usageChart.data = chartData;
+                usageChart.update();
+            } else {
+                usageChart = new Chart(usageCtx, { type: 'bar', data: chartData, options: chartOptions });
+            }
+        }
+
+        /**
+         * Renders the news articles on the page.
+         * @param {Array} articles The list of articles to display.
+         * @param {string} title The title for the news feed.
+         */
+        function renderArticles(articles, title) {
+            feedTitle.textContent = title;
+            newsList.innerHTML = '';
+            if (articles.length === 0) {
+                newsList.innerHTML = '<p class="text-center text-gray-500">No articles found.</p>';
+                return;
+            }
+            articles.forEach(article => {
+                const articleCard = document.createElement('a');
+                articleCard.href = article.url || '#';
+                articleCard.target = '_blank';
+                articleCard.className = 'article-card';
+                
+                const imageUrl = article.urlToImage || 'https://placehold.co/100x100/e2e8f0/64748b?text=Image';
+                const publishedDate = new Date(article.publishedAt).toLocaleDateString();
+                
+                articleCard.innerHTML = `
+                    <img src="${imageUrl}" alt="${article.title}" onerror="this.onerror=null;this.src='https://placehold.co/100x100/e2e8f0/64748b?text=Image'">
+                    <div class="article-content">
+                        <h3 class="article-title">${article.title}</h3>
+                        <div class="article-meta">
+                            <span>Source: ${article.source.name}</span> | <span>Published: ${publishedDate}</span>
+                        </div>
+                        <p class="article-description">${article.description || ''}</p>
+                    </div>
+                `;
+                
+                newsList.appendChild(articleCard);
+            });
+        }
+        
+        /**
+         * Fetches and displays news articles for a given category.
+         * @param {string} category The news category.
+         */
+        async function fetchNews(category) {
+            newsList.innerHTML = '<p class="text-center text-gray-500">Loading headlines...</p>';
+            try {
+                const response = await fetch(`/api/news/${category}`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to fetch news.');
+                }
+                const articles = await response.json();
+                renderArticles(articles, 'Top Headlines');
+            } catch (error) {
+                console.error('Error fetching news:', error);
+                newsList.innerHTML = `<p class="text-center text-red-500">Error: ${error.message}</p>`;
+            }
+        }
+
+        /**
+         * Handles the search functionality.
+         * @param {Event} event The form submission event.
+         */
+        async function handleSearch(event) {
+            event.preventDefault();
+            const keyword = searchInput.value.trim();
+            if (keyword === '') {
+                return;
+            }
+            
+            showSection('news-section');
+            newsList.innerHTML = '<p class="text-center text-gray-500">Searching for ' + keyword + '...</p>';
+            
+            // Deactivate all category tabs
+            tabButtons.forEach(btn => {
+                btn.classList.remove('text-blue-600', 'border-blue-600');
+                btn.classList.add('border-transparent', 'text-gray-700');
+            });
+            
+            try {
+                const response = await fetch(`/api/search?keyword=${encodeURIComponent(keyword)}`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Search failed.');
+                }
+                const articles = await response.json();
+                renderArticles(articles, `Search Results for "${keyword}"`);
+            } catch (error) {
+                console.error('Error searching news:', error);
+                newsList.innerHTML = `<p class="text-center text-red-500">Error: ${error.message}</p>`;
+            }
+        }
+        
+        /**
+         * Utility function to get a random color for the charts.
+         * @returns {string} A hex color code.
+         */
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // --- Event Listeners and Initial Setup ---
+        
+        // Add click event listeners to category tabs
+        tabButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('text-blue-600', 'border-blue-600');
+                    btn.classList.add('border-transparent', 'text-gray-700');
+                });
+                event.target.classList.add('text-blue-600', 'border-blue-600');
+                event.target.classList.remove('border-transparent', 'text-gray-700');
+                currentCategory = event.target.dataset.category;
+                fetchNews(currentCategory);
+                if (!analysisSection.classList.contains('hidden')) {
+                    updateAllCharts(currentCategory);
+                }
+            });
+        });
+
+        // Event listeners for sidebar navigation
+        newsFeedLink.addEventListener('click', () => {
+            showSection('news-section');
+            fetchNews(currentCategory);
+        });
+
+        analysisLink.addEventListener('click', () => {
+            showSection('analysis-section');
+        });
+
+        profileLink.addEventListener('click', () => {
+            showSection('profile-section');
+        });
+
+        // Event listener for image upload
+        document.getElementById('image-upload').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('profile-image').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Event listener for the new search form
+        searchForm.addEventListener('submit', handleSearch);
+        
+        // Event listener for the Save Changes button
+        document.getElementById('save-profile-btn').addEventListener('click', () => {
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+
+            // Simple validation and mock save
+            if (username && email && phone) {
+                // Using a custom modal-like message since alert() is restricted
+                const messageBox = document.createElement('div');
+                messageBox.innerHTML = `
+                    <div class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+                        <div class="bg-white p-6 rounded-lg shadow-xl text-center">
+                            <h3 class="text-xl font-bold mb-4">Profile Updated!</h3>
+                            <p>Your profile information has been saved successfully.</p>
+                            <button id="close-message" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">OK</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(messageBox);
+                document.getElementById('close-message').addEventListener('click', () => {
+                    document.body.removeChild(messageBox);
+                });
+
+                console.log('Saving profile data:', { username, email, phone });
+            } else {
+                const messageBox = document.createElement('div');
+                messageBox.innerHTML = `
+                    <div class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+                        <div class="bg-white p-6 rounded-lg shadow-xl text-center">
+                            <h3 class="text-xl font-bold mb-4">Incomplete Information</h3>
+                            <p>Please fill in all the required fields.</p>
+                            <button id="close-message" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">OK</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(messageBox);
+                document.getElementById('close-message').addEventListener('click', () => {
+                    document.body.removeChild(messageBox);
+                });
+            }
+        });
+
+        // Initial setup on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchNews(currentCategory);
+            showSection('news-section');
+        });
+    </script>
+</body>
+</html>

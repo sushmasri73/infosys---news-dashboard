@@ -1,0 +1,36 @@
+body {
+    background-color: #e9ecef;
+    font-family: 'Inter', sans-serif;
+}
+
+.news-card {
+    transition: transform 0.2s;
+}
+
+.news-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.welcome-text {
+    font-size: 1.25rem;
+    color: #343a40;
+}
+
+📃

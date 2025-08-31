@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logged Out</title>
+    <!-- Use the Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Main container for the logout message and link -->
+    <div class="bg-white p-8 md:p-12 rounded-2xl shadow-xl max-w-lg mx-auto text-center transition-transform transform hover:scale-105 duration-300">
+        <!-- Success icon or symbol -->
+        <div class="text-green-500 mb-6">
+            <svg class="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        </div>
+
+        <!-- Heading for the logout message -->
+        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-4">
+            You have been logged out.
+        </h1>
+
+        <!-- Sub-heading or descriptive text -->
+        <p class="text-gray-600 mb-8 text-base md:text-lg">
+            Thank you for using our service. We hope to see you again soon.
+        </p>
+
+        <!-- Button to navigate to the login page -->
+        <a href="#" id="logout-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full transition-colors duration-300 transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50">
+            Log In Again
+        </a>
+    </div>
+
+    <script>
+        // --- JavaScript for Logout Functionality ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const logoutButton = document.getElementById('logout-button');
+            
+            // This function handles the logout logic
+            const handleLogout = (e) => {
+                e.preventDefault(); // Prevent the default link behavior
+                console.log('Logout initiated...');
+
+                // In a real application, you would perform an API call to your server
+                // to invalidate the user's session or token here.
+                // For this example, we will simulate clearing user data from localStorage.
+                try {
+                    localStorage.removeItem('userToken');
+                    localStorage.removeItem('userName');
+                    console.log('User session data cleared from localStorage.');
+                    // Redirect to the login page after a successful logout
+                    window.location.href = 'login.html';
+                } catch (error) {
+                    console.error('An error occurred during logout:', error);
+                    // You could display an error message to the user here.
+                    alert('Logout failed. Please try again.');
+                }
+            };
+            
+            // Attach the event listener to the button
+            if (logoutButton) {
+                logoutButton.addEventListener('click', handleLogout);
+            }
+        });
+    </script>
+
+</body>
+</html>
